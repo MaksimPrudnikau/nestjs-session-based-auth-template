@@ -6,8 +6,8 @@ import { Config } from '../../config';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
 import { TokenService } from '../token/token.service';
 import { User } from '@prisma/client';
-import { uuid } from 'uuidv4';
 import * as moment from 'moment';
+import { v4 as uuid } from 'uuid';
 
 type UserInput =
   | {
