@@ -1,7 +1,10 @@
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { INestApplication } from '@nestjs/common';
+import { patchNestJsSwagger } from 'nestjs-zod';
 
 export function addSwagger(app: INestApplication) {
+  patchNestJsSwagger();
+
   const config = new DocumentBuilder()
     .setTitle('Remusic API')
     .setDescription('Remusic API description')
