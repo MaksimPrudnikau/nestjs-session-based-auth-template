@@ -1,5 +1,5 @@
 import { ApiController } from '../bootstrap/api-controller.decorator';
-import { Body, NotImplementedException, Post } from '@nestjs/common';
+import { Body, Post } from '@nestjs/common';
 import { SignUpDto } from './dto/sign-up.dto';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/sign-in.dto';
@@ -10,7 +10,7 @@ export class AuthController {
 
   @Post('sign-up')
   signUp(@Body() body: SignUpDto) {
-    throw new NotImplementedException();
+    return this.authService.register(body);
   }
 
   @Post('sign-in')
