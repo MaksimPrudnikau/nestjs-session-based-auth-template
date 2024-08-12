@@ -6,6 +6,8 @@ import { Config } from '../../config';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
 import { TokenService } from '../token/token.service';
 import { User } from '@prisma/client';
+import { uuid } from 'uuidv4';
+import moment from 'moment';
 
 type UserInput =
   | {
@@ -43,23 +45,26 @@ export class UserService {
     });
   }
 
-  async create(signUpDto: SignUpDto): Promise<User> {
+  async create(signUpDto: SignUpDto) {
     const salt = this.configService.get('HASH_SALT');
-    const passwordHashPromise = bcrypt.hash(signUpDto.password, salt);
-
-    const refreshTokenPromise = this.tokenService.generateRefreshToken();
-
-    const [password_hash, refresh_token] = await Promise.all([
-      passwordHashPromise,
-      refreshTokenPromise,
-    ]);
+    const password_hash = await bcrypt.hash(signUpDto.password, salt);
 
     return this.prisma.user.create({
       data: {
+        id: uuid(),
         name: signUpDto.name,
         email: signUpDto.email,
         password_hash,
-        refresh_token,
+        refresh_token: {
+          create: {
+            id: uuid(),
+            expires_at: moment().add(1, 'd').toDate(),
+            value: this.tokenService.generateRefreshToken(),
+          },
+        },
+      },
+      include: {
+        refresh_token: true,
       },
     });
   }

@@ -20,12 +20,14 @@ export class AuthService {
       throw new UnauthorizedException('User already exists');
     }
 
-    const { id: userId, refresh_token } =
-      await this.userService.create(signUpDto);
+    const {
+      id: userId,
+      refresh_token: { value: refresh_token },
+    } = await this.userService.create(signUpDto);
 
     const access_token = await this.tokenService.generateAccessToken(userId);
 
-    return { access_token, refresh_token: refresh_token! };
+    return { access_token, refresh_token };
   }
 
   async login(signInDto: SignInDto) {

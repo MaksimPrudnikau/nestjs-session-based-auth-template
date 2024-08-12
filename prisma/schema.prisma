@@ -1,25 +1,40 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["auth", "public"]
+}
+
+model refresh_token {
+  id         String   @id(map: "refresh_token_pk") @db.Uuid
+  expires_at DateTime @db.Timestamptz(6)
+  value      String
+  user       User[]   @relation("User_refresh_tokenTorefresh_token")
+
+  @@schema("auth")
 }
 
 model User {
-  id            Int      @id(map: "users_pk") @default(autoincrement())
-  name          String   @unique(map: "users_name_uindex") @db.VarChar(25)
-  email         String   @unique(map: "users_email_uindex") @db.VarChar(255)
-  password_hash String
-  created_at    DateTime @default(now()) @db.Timestamptz(6)
-  refresh_token String?
-  is_deleted    Boolean  @default(false)
+  id               String        @id(map: "users_pk") @db.Uuid
+  name             String        @unique(map: "users_name_uindex") @db.VarChar(25)
+  email            String        @unique(map: "users_email_uindex") @db.VarChar(255)
+  password_hash    String
+  created_at       DateTime      @default(now()) @db.Timestamptz(6)
+  is_deleted       Boolean       @default(false)
+  refresh_token_id String        @db.Uuid
+  refresh_token    refresh_token @relation("User_refresh_tokenTorefresh_token", fields: [refresh_token_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_refresh_token_id_fk")
 
-  @@map("Users")
+  @@schema("public")
 }
 
 enum roles {
   super_admin
   user
+
+  @@schema("public")
 }
+
