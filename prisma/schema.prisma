@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Users {
   id            Int      @id(map: "users_pk") @default(autoincrement())
   name          String   @unique(map: "users_name_uindex") @db.VarChar(25)
   email         String   @unique(map: "users_email_uindex") @db.VarChar(255)
