@@ -24,7 +24,7 @@ export class TokenService {
   }
 
   generateAccessToken(userId: User['id']) {
-    return this.jwtService.signAsync({ userId }, { expiresIn: '1h' });
+    return this.jwtService.signAsync({ userId });
   }
 
   generateRefreshToken() {

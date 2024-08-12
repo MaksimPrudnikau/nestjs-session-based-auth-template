@@ -13,10 +13,12 @@ type UserInput =
   | {
       name?: User['name'];
       email: User['email'];
+      hidePassword?: boolean;
     }
   | {
       name: User['name'];
       email?: User['email'];
+      hidePassword?: boolean;
     };
 
 @Injectable()
@@ -33,14 +35,20 @@ export class UserService {
         id,
         is_deleted: false,
       },
+      omit: {
+        password_hash: true,
+      },
     });
   }
 
-  getByNameOrEmail({ name, email }: UserInput) {
+  getByNameOrEmail({ name, email, hidePassword }: UserInput) {
     return this.prisma.user.findFirst({
       where: {
         OR: [{ email }, { name }],
         is_deleted: false,
+      },
+      omit: {
+        password_hash: !hidePassword,
       },
     });
   }
@@ -65,6 +73,23 @@ export class UserService {
       },
       include: {
         refresh_token: true,
+      },
+      omit: {
+        password_hash: true,
+      },
+    });
+  }
+
+  delete(id: User['id']) {
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        is_deleted: true,
+      },
+      omit: {
+        password_hash: true,
       },
     });
   }

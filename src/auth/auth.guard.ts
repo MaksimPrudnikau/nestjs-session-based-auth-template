@@ -2,12 +2,13 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import { Payload } from './types/payload';
+import { Payload, PayloadSchema } from './types/payload';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -23,6 +24,7 @@ export class AuthGuard implements CanActivate {
     }
 
     request['payload'] = this.verifyToken(token);
+    Logger.log(request['payload']);
     return true;
   }
 
@@ -32,9 +34,10 @@ export class AuthGuard implements CanActivate {
 
   private verifyToken(token: string) {
     try {
-      return this.jwtService.verify<Payload>(token);
-    } catch (e) {
-      throw new UnauthorizedException('Invalid token');
+      const payload = this.jwtService.verify<Payload>(token);
+      return PayloadSchema.parse(payload);
+    } catch (e: any) {
+      throw new UnauthorizedException('Invalid token', e.message);
     }
   }
 }

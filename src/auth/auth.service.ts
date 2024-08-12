@@ -33,6 +33,7 @@ export class AuthService {
   async login(signInDto: SignInDto) {
     const user = await this.userService.getByNameOrEmail({
       email: signInDto.email,
+      hidePassword: false,
     });
 
     if (!user) {

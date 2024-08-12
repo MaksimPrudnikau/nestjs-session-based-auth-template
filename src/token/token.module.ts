@@ -10,6 +10,9 @@ import { Config } from '../../config';
       useFactory: (configService: ConfigService<Config>) => ({
         global: true,
         secret: configService.get('JWT_ACCESS_SECRET'),
+        signOptions: {
+          expiresIn: 1,
+        },
       }),
       global: true,
       inject: [ConfigService],
