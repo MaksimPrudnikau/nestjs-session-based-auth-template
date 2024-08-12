@@ -11,6 +11,7 @@ import { Config } from '../../config';
         global: true,
         secret: configService.get('JWT_ACCESS_SECRET'),
       }),
+      global: true,
       inject: [ConfigService],
     }),
   ],
