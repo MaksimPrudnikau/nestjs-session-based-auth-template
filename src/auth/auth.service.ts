@@ -4,6 +4,7 @@ import { SignInDto } from './dto/sign-in.dto';
 import { PrismaService } from '../bootstrap/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { Config } from '../../config';
 
 @Injectable()
@@ -11,7 +12,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly configService: Config,
+    private readonly configService: ConfigService<Config>,
   ) {}
 
   async register(signUpDto: SignUpDto) {

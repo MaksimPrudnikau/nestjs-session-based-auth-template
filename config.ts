@@ -1,5 +1,4 @@
 import { z } from 'nestjs-zod/z';
-import { ConfigService } from '@nestjs/config';
 
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'production']).default('development'),
@@ -8,4 +7,4 @@ const schema = z.object({
   HASH_SALT: z.string(),
 });
 
-export type Config = ConfigService<z.infer<typeof schema>>;
+export type Config = z.infer<typeof schema>;
