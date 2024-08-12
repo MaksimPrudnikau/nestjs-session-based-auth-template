@@ -9,6 +9,6 @@ export class UsersController {
 
   @Get(':id')
   getById(@Param('id') id: string): Promise<User | null> {
-    return this.userService.get(+id);
+    return this.userService.get(id);
   }
 }
