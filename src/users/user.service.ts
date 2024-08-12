@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../bootstrap/prisma.service';
-import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { Config } from '../../config';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
-import { TokenService } from '../auth/token.service';
+import { TokenService } from '../token/token.service';
+import { User } from '@prisma/client';
 
 type UserInput =
   | {

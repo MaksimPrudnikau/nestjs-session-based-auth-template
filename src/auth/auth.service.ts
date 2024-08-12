@@ -1,16 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
-import { PrismaService } from '../bootstrap/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { TokenService } from './token.service';
+import { TokenService } from '../token/token.service';
 import { UserService } from '../users/user.service';
-import { AuthTokens } from './types/auth-tokens';
+import { AuthTokens } from '../token/types/auth-tokens';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prisma: PrismaService,
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
   ) {}
