@@ -3,7 +3,7 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { PrismaService } from '../bootstrap/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
+import { TokenService } from './token.service';
 import { ConfigService } from '@nestjs/config';
 import { Config } from '../../config';
 
@@ -11,7 +11,7 @@ import { Config } from '../../config';
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
+    private readonly tokenService: TokenService,
     private readonly configService: ConfigService<Config>,
   ) {}
 
@@ -19,9 +19,7 @@ export class AuthService {
     const user = await this.prisma.user.findFirst({
       where: {
         OR: [{ email: signUpDto.email }, { name: signUpDto.name }],
-        NOT: {
-          is_deleted: true,
-        },
+        is_deleted: false,
       },
     });
 
@@ -30,21 +28,29 @@ export class AuthService {
     }
 
     const salt = this.configService.get('HASH_SALT');
-    const password_hash = await bcrypt.hash(signUpDto.password, salt);
 
-    return this.prisma.user.create({
+    const [password_hash, tokens] = await Promise.all([
+      await bcrypt.hash(signUpDto.password, salt),
+      this.tokenService.generateTokens(user),
+    ]);
+
+    await this.prisma.user.create({
       data: {
         name: signUpDto.name,
         email: signUpDto.email,
         password_hash,
+        refresh_token: tokens.refresh_token,
       },
     });
+
+    return tokens;
   }
 
   async login(signInDto: SignInDto) {
     const user = await this.prisma.user.findFirst({
       where: {
         email: signInDto.email,
+        is_deleted: false,
       },
     });
 
@@ -61,11 +67,6 @@ export class AuthService {
       throw new UnauthorizedException('Wrong credentials');
     }
 
-    const accessToken = await this.jwtService.signAsync(
-      { userId: user.id },
-      { expiresIn: '7d' },
-    );
-
-    return { accessToken, refreshToken: '' };
+    return this.tokenService.generateTokens(user);
   }
 }
