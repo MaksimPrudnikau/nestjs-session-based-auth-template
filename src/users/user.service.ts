@@ -48,7 +48,7 @@ export class UserService {
         is_deleted: false,
       },
       omit: {
-        password_hash: !hidePassword,
+        password_hash: hidePassword === undefined ? true : hidePassword,
       },
     });
   }

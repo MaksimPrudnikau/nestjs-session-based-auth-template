@@ -11,7 +11,7 @@ import { Config } from '../../config';
         global: true,
         secret: configService.get('JWT_ACCESS_SECRET'),
         signOptions: {
-          expiresIn: 1,
+          expiresIn: '1m',
         },
       }),
       global: true,
