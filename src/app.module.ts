@@ -8,6 +8,7 @@ import { APP_PIPE } from '@nestjs/core';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { AuthModule } from './auth/auth.module';
 import { TokenModule } from './token/token.module';
+import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TokenModule } from './token/token.module';
     AuthModule,
     UsersModule,
     TokenModule,
+    SessionModule,
   ],
   controllers: [AppController],
   providers: [

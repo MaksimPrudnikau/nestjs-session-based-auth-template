@@ -4,10 +4,9 @@ import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { Config } from '../../config';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
-import { TokenService } from '../token/token.service';
 import { User } from '@prisma/client';
-import * as moment from 'moment';
 import { v4 as uuid } from 'uuid';
+import { SessionService } from '../session/session.service';
 
 type UserInput =
   | {
@@ -26,7 +25,7 @@ export class UserService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService<Config>,
-    private readonly tokenService: TokenService,
+    private readonly sessionService: SessionService,
   ) {}
 
   get(id: User['id']) {
@@ -50,6 +49,11 @@ export class UserService {
       omit: {
         password_hash: hidePassword === undefined ? true : hidePassword,
       },
+      include: {
+        user_session: {
+          select: { id: true },
+        },
+      },
     });
   }
 
@@ -63,16 +67,6 @@ export class UserService {
         name: signUpDto.name,
         email: signUpDto.email,
         password_hash,
-        refresh_token: {
-          create: {
-            id: uuid(),
-            expires_at: moment().add(1, 'd').toDate(),
-            value: this.tokenService.generateRefreshToken(),
-          },
-        },
-      },
-      include: {
-        refresh_token: true,
       },
       omit: {
         password_hash: true,

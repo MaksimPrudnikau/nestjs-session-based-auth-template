@@ -3,6 +3,7 @@ import { TokenService } from './token.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Config } from '../../config';
+import { SessionModule } from '../session/session.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { Config } from '../../config';
       global: true,
       inject: [ConfigService],
     }),
+    SessionModule,
   ],
   providers: [TokenService],
   exports: [TokenService],

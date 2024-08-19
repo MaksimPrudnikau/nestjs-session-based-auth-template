@@ -9,17 +9,32 @@ import { Observable } from 'rxjs';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { Payload, PayloadSchema } from './types/payload';
+import { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from './roles.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly reflector: Reflector,
+  ) {}
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request: Request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
 
-    request['payload'] = this.verifyToken(token);
+    const isPublic = this.reflector.getAllAndOverride<boolean | undefined>(
+      IS_PUBLIC_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
+    if (isPublic || isPublic === undefined) {
+      request['payload'] = this.jwtService.decode(token);
+    } else {
+      request['payload'] = this.verifyToken(token);
+    }
+
     Logger.log(request['payload']);
 
     return true;
