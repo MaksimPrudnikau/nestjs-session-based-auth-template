@@ -23,13 +23,10 @@ export class AuthService {
     }
 
     const newUser = await this.userService.create(signUpDto);
-    const session = await this.sessionService.createOrUpdate(
+
+    const [session, access_token] = await this.restoreSession(
       newUser.id,
       fingerPrint,
-    );
-
-    const access_token = await this.tokenService.generateAccessToken(
-      newUser.id,
     );
 
     return { access_token, refresh_token: session.id };
@@ -54,16 +51,21 @@ export class AuthService {
       throw new UnauthorizedException('Wrong credentials');
     }
 
-    const session = await this.sessionService.createOrUpdate(
+    const [session, access_token] = await this.restoreSession(
       user.id,
       fingerPrint,
     );
-
-    const access_token = await this.tokenService.generateAccessToken(user.id);
 
     return {
       access_token,
       refresh_token: session.id,
     };
+  }
+
+  private restoreSession(userId: string, fingerPrint: IFingerprint) {
+    return Promise.all([
+      this.sessionService.createOrUpdate(userId, fingerPrint),
+      this.tokenService.generateAccessToken(userId),
+    ]);
   }
 }
