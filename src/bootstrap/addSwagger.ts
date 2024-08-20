@@ -9,6 +9,7 @@ export function addSwagger(app: INestApplication) {
     .setTitle('Remusic API')
     .setDescription('Remusic API description')
     .setVersion('1.0')
+    .addServer('http://localhost:3001')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

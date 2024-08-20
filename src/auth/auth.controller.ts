@@ -1,33 +1,35 @@
 import { ApiController } from '../bootstrap/api-controller.decorator';
-import { Body, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { SignUpDto } from './dto/sign-up.dto';
-import { AuthService } from './auth.service';
+import { UserService } from '../users/user.service';
+import { LocalAuthGuard } from './local.auth.guard';
 import { SignInDto } from './dto/sign-in.dto';
-import { AuthGuard } from './auth.guard';
-import { Fingerprint, IFingerprint } from 'nestjs-fingerprint';
+import { Authorized } from './authorized.decorator';
 
 @ApiController('Auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly userService: UserService) {}
 
   @Post('sign-up')
-  async signUp(@Body() body: SignUpDto, @Fingerprint() fp: IFingerprint) {
-    return this.authService.register(body, fp);
+  async signUp(@Body() body: SignUpDto) {
+    return this.userService.create(body);
   }
 
+  @UseGuards(LocalAuthGuard)
   @Post('sign-in')
-  signIn(@Body() body: SignInDto, @Fingerprint() fp: IFingerprint) {
-    return this.authService.login(body, fp);
+  signIn(@Body() signInDto: SignInDto, @Request() req: any) {
+    return req.user;
   }
 
-  @UseGuards(AuthGuard)
+  @Authorized()
   @Get('protected')
-  protectedRoute(@Req() req: Request) {
-    return req['payload'];
+  getProtected(@Request() req: any) {
+    return req.user;
   }
 
-  @Get('finger-print')
-  getFingerPrint(@Fingerprint() fp: IFingerprint) {
-    return fp;
+  @Post('sign-out')
+  signOut(@Request() req: any) {
+    req.session.destroy();
+    return 'success logout';
   }
 }

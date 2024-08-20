@@ -1,11 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { addSwagger } from './bootstrap/addSwagger';
+import { addSessionAuthentication } from './bootstrap/addSessionAuthentication';
 
 declare const module: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  addSessionAuthentication(app);
 
   if (process.env.NODE_ENV !== 'production') {
     addSwagger(app);
@@ -19,4 +22,5 @@ async function bootstrap() {
     addSwagger(app);
   }
 }
+
 bootstrap();

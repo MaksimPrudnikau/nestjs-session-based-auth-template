@@ -1,22 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { TokenModule } from '../token/token.module';
 import { UsersModule } from '../users/users.module';
-import { NestjsFingerprintModule } from 'nestjs-fingerprint';
+import { PassportModule } from '@nestjs/passport';
+import { LocalStrategy } from './local.strategy';
+import { SessionSerializer } from './session.serializer';
 
 @Module({
-  imports: [
-    NestjsFingerprintModule.forRoot({
-      params: ['headers', 'userAgent', 'ipAddress'],
-      cookieOptions: {
-        httpOnly: true, // optional
-      },
-    }),
-    TokenModule,
-    UsersModule,
-  ],
-  providers: [AuthService],
+  imports: [UsersModule, PassportModule.register({ session: true })],
+  providers: [AuthService, LocalStrategy, SessionSerializer],
   controllers: [AuthController],
   exports: [],
 })

@@ -4,11 +4,10 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './bootstrap/prisma.module';
 import { UsersModule } from './users/users.module';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { AuthModule } from './auth/auth.module';
-import { TokenModule } from './token/token.module';
-import { SessionModule } from './session/session.module';
+import { AuthenticatedGuard } from './auth/authenticated.guard';
 
 @Module({
   imports: [
@@ -19,8 +18,6 @@ import { SessionModule } from './session/session.module';
     PrismaModule,
     AuthModule,
     UsersModule,
-    TokenModule,
-    SessionModule,
   ],
   controllers: [AppController],
   providers: [
@@ -28,6 +25,10 @@ import { SessionModule } from './session/session.module';
     {
       provide: APP_PIPE,
       useClass: ZodValidationPipe,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthenticatedGuard,
     },
   ],
 })

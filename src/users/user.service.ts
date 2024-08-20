@@ -6,7 +6,6 @@ import { Config } from '../../config';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
 import { User } from '@prisma/client';
 import { v4 as uuid } from 'uuid';
-import { SessionService } from '../session/session.service';
 
 type UserInput =
   | {
@@ -25,7 +24,6 @@ export class UserService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService<Config>,
-    private readonly sessionService: SessionService,
   ) {}
 
   get(id: User['id']) {
@@ -48,11 +46,6 @@ export class UserService {
       },
       omit: {
         password_hash: hidePassword === undefined ? true : hidePassword,
-      },
-      include: {
-        user_session: {
-          select: { id: true },
-        },
       },
     });
   }
