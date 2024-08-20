@@ -1,14 +1,18 @@
 import { ApiController } from '../bootstrap/api-controller.decorator';
 import { UserService } from './user.service';
-import { Get, Param } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Delete, Get, Param } from '@nestjs/common';
 
 @ApiController('Users')
 export class UsersController {
   constructor(private readonly userService: UserService) {}
 
   @Get(':id')
-  getById(@Param('id') id: string): Promise<User> {
-    return this.userService.get(+id);
+  getById(@Param('id') id: string) {
+    return this.userService.get(id);
+  }
+
+  @Delete(':id')
+  deleteOne(@Param('id') id: string) {
+    return this.userService.delete(id);
   }
 }
