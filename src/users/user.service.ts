@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { Config } from '../../config';
 import { SignUpDto } from '../auth/dto/sign-up.dto';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { v4 as uuid } from 'uuid';
 
 type UserInput =
@@ -27,27 +27,23 @@ export class UserService {
   ) {}
 
   get(id: User['id']) {
-    return this.prisma.user.findFirst({
+    return this.getUser({
       where: {
         id,
-        is_deleted: false,
-      },
-      omit: {
-        password_hash: true,
       },
     });
   }
 
   getByNameOrEmail({ name, email, hidePassword }: UserInput) {
-    return this.prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { name }],
-        is_deleted: false,
+    return this.getUser(
+      {
+        where: {
+          OR: [{ email }, { name }],
+          is_deleted: false,
+        },
       },
-      omit: {
-        password_hash: hidePassword === undefined ? true : hidePassword,
-      },
-    });
+      { hidePassword },
+    );
   }
 
   async create(signUpDto: SignUpDto) {
@@ -77,6 +73,26 @@ export class UserService {
       },
       omit: {
         password_hash: true,
+      },
+    });
+  }
+
+  //omit password and exclude deleted by default
+  private getUser(
+    {
+      where,
+      include,
+    }: { where: Prisma.UserWhereInput; include?: Prisma.UserInclude },
+    options?: { hidePassword?: boolean; includeDeleted?: boolean },
+  ) {
+    return this.prisma.user.findFirst({
+      where: {
+        ...where,
+        is_deleted: options?.includeDeleted ?? false,
+      },
+      include,
+      omit: {
+        password_hash: options?.hidePassword ?? true,
       },
     });
   }
