@@ -79,10 +79,7 @@ export class UserService {
 
   //omit password and exclude deleted by default
   private getUser(
-    {
-      where,
-      include,
-    }: { where: Prisma.UserWhereInput; include?: Prisma.UserInclude },
+    { where }: { where: Prisma.UserWhereInput },
     options?: { hidePassword?: boolean; includeDeleted?: boolean },
   ) {
     return this.prisma.user.findFirst({
@@ -90,7 +87,6 @@ export class UserService {
         ...where,
         is_deleted: options?.includeDeleted ?? false,
       },
-      include,
       omit: {
         password_hash: options?.hidePassword ?? true,
       },
