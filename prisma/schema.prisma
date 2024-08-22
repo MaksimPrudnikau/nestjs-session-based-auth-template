@@ -10,12 +10,22 @@ datasource db {
 }
 
 model User {
-  id            String   @id(map: "users_pk") @db.Uuid
-  name          String   @unique(map: "users_name_uindex") @db.VarChar(25)
-  email         String   @unique(map: "users_email_uindex") @db.VarChar(255)
+  id            String     @id(map: "users_pk") @db.Uuid
+  name          String     @unique(map: "users_name_uindex") @db.VarChar(25)
+  email         String     @unique(map: "users_email_uindex") @db.VarChar(255)
   password_hash String
-  created_at    DateTime @default(now()) @db.Timestamptz(6)
-  is_deleted    Boolean  @default(false)
+  created_at    DateTime   @default(now()) @db.Timestamptz(6)
+  is_deleted    Boolean    @default(false)
+  UserRole      UserRole[]
+
+  @@schema("public")
+}
+
+model UserRole {
+  id      Int    @id(map: "userrole_pk")
+  user_fk String @db.Uuid
+  role    roles? @default(user)
+  User    User   @relation(fields: [user_fk], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "userroles_user_id_fk")
 
   @@schema("public")
 }
