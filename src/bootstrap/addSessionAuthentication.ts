@@ -4,7 +4,11 @@ import * as passport from 'passport';
 
 export function addSessionAuthentication(app: INestApplication) {
   app.use(
-    session({ secret: 'keyboard', resave: false, saveUninitialized: false }),
+    session({
+      secret: process.env.SESSION_SECRET as string,
+      resave: false,
+      saveUninitialized: false,
+    }),
   );
 
   app.use(passport.initialize());
